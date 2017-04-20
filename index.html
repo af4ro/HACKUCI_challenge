@@ -10,19 +10,21 @@
     <header>
         <h2 class="header">HACKUCI Challenge</h2>
     </header>
+    <form action="/action_page.php">
+        Search Phrase: <input type="text" name="LastName"><br>
+        <input type="submit" value="Submit">
+    </form>
+    
     <div id="img-container">
-        <!--
-        <img src="pic1.jpg" onclick="openView()">
-        <img src="pic2.jpg" onclick="openView()" id="new">
-        <img src="pic3.jpg" onclick="GetSearchResults(new)">
--->
     </div>
+
     <div id="myLightBox" class="modal">
         <span class="close cursor" onclick="closeView()">&times;</span>
         <div class="modal-content">
-
-            <a class="prev" onclick="plusSlides(-1)">&#10094;</a>
-            <a class="next" onclick="plusSlides(1)">&#10095;</a>
+            <img id="inside_img" style="width:100%">
+            <a class="prev" onclick="minus_slider()">
+                &#10094;</a>
+            <a class="next" onclick="plus_slider()">&#10095;</a>
 
             <div class="caption-container">
                 <p id="caption"></p>
@@ -39,45 +41,29 @@
                 document.getElementById('myLightBox').style.display = "none";
             }
 
-            //            var slideIndex = 1;
-            //            showSlides(slideIndex);
-            //
-            //            function plusSlides(n) {
-            //                showSlides(slideIndex += n);
-            //            }
-            //
-            //            function currentSlide(n) {
-            //                showSlides(slideIndex = n);
-            //            }
-
-            //            function showSlides(n) {
-            //                var i;
-            //                var slides = document.getElementsByClassName("mySlides");
-            //                var dots = document.getElementsByClassName("demo");
-            //                var captionText = document.getElementById("caption");
-            //                if (n > slides.length) {
-            //                    slideIndex = 1
-            //                }
-            //                if (n < 1) {
-            //                    slideIndex = slides.length
-            //                }
-            //                for (i = 0; i < slides.length; i++) {
-            //                    slides[i].style.display = "none";
-            //                }
-            //                for (i = 0; i < dots.length; i++) {
-            //                    dots[i].className = dots[i].className.replace(" active", "");
-            //                }
-            //                slides[slideIndex - 1].style.display = "block";
-            //                dots[slideIndex - 1].className += " active";
-            //                captionText.innerHTML = dots[slideIndex - 1].alt;
-            //            }
-
-            var searchRequest = {
-                "phrase": "space"
-            }
-
             var appendApiKeyHeader = function(xhr) {
                 xhr.setRequestHeader('Api-Key', 'zpqygk23rw4a43ryj9gr8aat')
+            }
+
+            function mainViewer(num) {
+                console.log(document.getElementById(num).src);
+                current_slider = num;
+                document.getElementById("inside_img").src = document.getElementById(num).src;
+                document.getElementById("inside_img").style.display = "block";
+            }
+            var max_length;
+            var current_slider;
+
+            function plus_slider() {
+                if (current_slider + 1 <= max_length && current_slider + 1 > 0) {
+                    mainViewer(current_slider + 1);
+                }
+            }
+
+            function minus_slider() {
+                if (current_slider - 1 <= max_length && current_slider - 1 > 0) {
+                    mainViewer(current_slider - 1);
+                }
             }
 
             var xhr = new XMLHttpRequest();
@@ -85,20 +71,22 @@
             appendApiKeyHeader(xhr);
             xhr.send();
             xhr.onreadystatechange = processRequest;
-            console.log(xhr);
 
             function processRequest(e) {
                 if (xhr.readyState == 4 && xhr.status == 200) {
                     var gettresp = JSON.parse(xhr.responseText);
-                    console.log(gettresp);
                     var counter = 1;
+                    max_length = gettresp.result_count;
                     gettresp.images.forEach(function(obj) {
                         var img = new Image();
                         img.src = obj.display_sizes[0].uri;
                         img.setAttribute("alt", obj.title);
                         img.setAttribute("id", counter);
-                        img.setAttribute("onclick", "openView()");
+                        img.setAttribute("class", "images");
+
+                        img.setAttribute("onclick", "openView();mainViewer(" + counter + ")");
                         counter = counter + 1;
+
                         document.getElementById("img-container").appendChild(img);
                     });
                 }
