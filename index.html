@@ -10,11 +10,12 @@
     <header>
         <h2 class="header">HACKUCI Challenge</h2>
     </header>
-    <p id="demo"></p>
-    <div>
+    <div id="img-container">
+        <!--
         <img src="pic1.jpg" onclick="openView()">
         <img src="pic2.jpg" onclick="openView()" id="new">
         <img src="pic3.jpg" onclick="GetSearchResults(new)">
+-->
     </div>
     <div id="myLightBox" class="modal">
         <span class="close cursor" onclick="closeView()">&times;</span>
@@ -85,15 +86,23 @@
             xhr.send();
             xhr.onreadystatechange = processRequest;
             console.log(xhr);
-                
+
             function processRequest(e) {
                 if (xhr.readyState == 4 && xhr.status == 200) {
                     var gettresp = JSON.parse(xhr.responseText);
                     console.log(gettresp);
-                    document.getElementById("demo").innerHTML = gettresp.images[0].id;
+                    var counter = 1;
+                    gettresp.images.forEach(function(obj) {
+                        var img = new Image();
+                        img.src = obj.display_sizes[0].uri;
+                        img.setAttribute("alt", obj.title);
+                        img.setAttribute("id", counter);
+                        img.setAttribute("onclick", "openView()");
+                        counter = counter + 1;
+                        document.getElementById("img-container").appendChild(img);
+                    });
                 }
             }
-            //            document.getElementById("demo").innerHTML = xhr.readyState;
 
         </script>
 </body>
