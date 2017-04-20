@@ -10,11 +10,14 @@
     <header>
         <h2 class="header">HACKUCI Challenge</h2>
     </header>
-    <form action="/action_page.php">
-        Search Phrase: <input type="text" name="LastName"><br>
-        <input type="submit" value="Submit">
-    </form>
     
+<!--
+    <form >
+        Search Phrase: <input type="text" name="phrase_input" id = "phrase_input"><br>
+        <input type="submit" onclick = "doing()" value="Submit">
+    </form>
+-->
+
     <div id="img-container">
     </div>
 
@@ -65,32 +68,37 @@
                     mainViewer(current_slider - 1);
                 }
             }
+            
+//            var phrase = document.getElementById("phrase_input")[0].value;
+//            console.log(phrase);
+//            function doing() {
+                var xhr = new XMLHttpRequest();
+                var url = "https://api.gettyimages.com/v3/search/images?fields=id,title,thumb,referral_destinations&sort_order=best&phrase=";
+                xhr.open('GET', url+"space", true);
+                appendApiKeyHeader(xhr);
+                xhr.send();
+                xhr.onreadystatechange = processRequest;
 
-            var xhr = new XMLHttpRequest();
-            xhr.open('GET', "https://api.gettyimages.com/v3/search/images?fields=id,title,thumb,referral_destinations&sort_order=best&phrase=space", true);
-            appendApiKeyHeader(xhr);
-            xhr.send();
-            xhr.onreadystatechange = processRequest;
+                function processRequest(e) {
+                    if (xhr.readyState == 4 && xhr.status == 200) {
+                        var gettresp = JSON.parse(xhr.responseText);
+                        var counter = 1;
+                        max_length = gettresp.result_count;
+                        gettresp.images.forEach(function(obj) {
+                            var img = new Image();
+                            img.src = obj.display_sizes[0].uri;
+                            img.setAttribute("alt", obj.title);
+                            img.setAttribute("id", counter);
+                            img.setAttribute("class", "images");
 
-            function processRequest(e) {
-                if (xhr.readyState == 4 && xhr.status == 200) {
-                    var gettresp = JSON.parse(xhr.responseText);
-                    var counter = 1;
-                    max_length = gettresp.result_count;
-                    gettresp.images.forEach(function(obj) {
-                        var img = new Image();
-                        img.src = obj.display_sizes[0].uri;
-                        img.setAttribute("alt", obj.title);
-                        img.setAttribute("id", counter);
-                        img.setAttribute("class", "images");
+                            img.setAttribute("onclick", "openView();mainViewer(" + counter + ")");
+                            counter = counter + 1;
 
-                        img.setAttribute("onclick", "openView();mainViewer(" + counter + ")");
-                        counter = counter + 1;
-
-                        document.getElementById("img-container").appendChild(img);
-                    });
+                            document.getElementById("img-container").appendChild(img);
+                        });
+                    }
                 }
-            }
+//            }
 
         </script>
 </body>
